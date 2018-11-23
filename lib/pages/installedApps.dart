@@ -17,15 +17,40 @@ class _InstalledAppsState extends State<InstalledApps> {
   }
 
   void init() async {
+    /* SimplePermissions.checkPermission(Permission.ReadExternalStorage)
+        .then((isApproved) {
+      if (!isApproved) {
+        SimplePermissions.requestPermission(Permission.ReadExternalStorage)
+            .then((done) {
+          DeviceApps.getInstalledApplications(includeSystemApps: true)
+              .then((apps) {
+            var tempApps = new List();
+            tempApps.add(apps.length.toString());
+            for (final el in apps) {
+              tempApps.add(el.appName);
+            }
+            setState(() {
+              _apps = tempApps;
+            });
+          });
+        });
+      }
+    }); */
+
     bool checkPermission =
         await SimplePermissions.checkPermission(Permission.ReadExternalStorage);
     if (!checkPermission) {
       await SimplePermissions.requestPermission(Permission.ReadExternalStorage);
     }
-    List<Application> apps =
-        await DeviceApps.getInstalledApplications(includeSystemApps: true);
-    setState(() {
-      _apps = apps;
+    DeviceApps.getInstalledApplications(includeSystemApps: true).then((apps) {
+      var tempApps = new List();
+      tempApps.add(apps.length.toString());
+      for (final el in apps) {
+        tempApps.add(el.appName);
+      }
+      setState(() {
+        _apps = tempApps;
+      });
     });
   }
 
@@ -39,7 +64,7 @@ class _InstalledAppsState extends State<InstalledApps> {
                     child: new Column(
           children: _apps
               .map((el) => new Text(
-                    el.appName,
+                    el,
                     style: new TextStyle(
                         fontSize: 20.0,
                         fontWeight: FontWeight.bold,
